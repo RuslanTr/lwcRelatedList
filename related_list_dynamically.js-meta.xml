@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>48.0</apiVersion>
+    <description>Related List Dynamically</description>
+    <isExposed>true</isExposed>
+    <masterLabel>Related List Dynamically</masterLabel>
+    <targets>
+        <target>lightning__RecordPage</target>
+        <target>lightning__HomePage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property name="sObjectType" type="String" label="SObject Type"/>
+            <property name="relatedField" type="String" label="Related Field"/>
+            <property name="fieldsList" type="String" label="Fields List"/>
+            <property name="iconName" type="String" label="Icon Label"/>
+            </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

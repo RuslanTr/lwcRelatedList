@@ -1,0 +1,38 @@
+<!--
+ - Created by Руслан on 21.10.2020.
+ -->
+
+<!-- Related List Dynamically-->
+<template>
+    <lightning-card>
+        <article class="slds-card slds-card_boundary headerBottomBorder forceRelatedListCardDesktop">
+            <div class="slds-grid slds-page-header forceRelatedListCardHeader">
+                <div class="slds-media slds-media_center slds-has-flexi-truncate ">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name={iconName} size="small"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <a class="slds-card__header-link" onclick={navigateToRelatedList}>{pluralLabel} {titleWithCount}</a>
+                        </h2>
+                    </div>
+                </div>
+                <lightning-button label="New" slot="actions" onclick={createNew}></lightning-button>
+            </div>
+            <template if:true={listRecords}>
+                    <div>
+                        <lightning-datatable class="related-list"
+                                             columns={columns}
+                                             data={listRecords}
+                                             key-field="Id"
+                                             hide-checkbox-column="true"
+                                             resize-column-disabled="true">
+                        </lightning-datatable>
+                    </div>
+                <footer class="slds-card__footer">
+                    <a onclick={navigateToRelatedList}>View All</a>
+                </footer>
+            </template>
+        </article>
+    </lightning-card>
+</template>
