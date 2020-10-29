@@ -3,7 +3,7 @@
  */
 
 import {LightningElement, api, wire, track} from 'lwc';
-import recordCount from '@salesforce/apex/DynamicRelatedListController.recordCount';
+import numOfRecords from '@salesforce/apex/DynamicRelatedListController.numOfRecords';
 import getRecords from '@salesforce/apex/DynamicRelatedListController.getRecords';
 import getPluralLabel from '@salesforce/apex/DynamicRelatedListController.getPluralLabel';
 import { NavigationMixin } from 'lightning/navigation';
@@ -11,7 +11,7 @@ import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
 
 export default class RelatedListDynamically extends NavigationMixin (LightningElement) {
-    isRendered = false;
+    chartJsInitialized = false;
     @api iconName;
     @api sObjectType;
     @api relatedField;
@@ -20,73 +20,67 @@ export default class RelatedListDynamically extends NavigationMixin (LightningEl
     @track dataTypes;
     @track titleWithCount;
     @track listRecords;
-    @track recordCount;
-    @track countBool;
+    @track numOfRecords;
     @track pluralLabel;
     columns = [];
 
-    get obj() {
+    get objectName() {
         return this.sObjectType;
     }
 
-    @wire(getObjectInfo, { objectApiName: '$obj' })
-    objInfo({ data, error }) {
+    @wire(getObjectInfo, { objectApiName: '$objectName' })
+    getHeadersTypesMap({ data, error }) {
         if (data) {
-            console.log('get');
             this.dataTypes = new Map(Object.values(data.fields).map(el => [el.apiName, el.dataType]));
         }
     }
 
     renderedCallback() {
-        if(this.isRendered) return;
+        if(this.chartJsInitialized) return;
         if(this.dataTypes && this.dataTypes.size){
-            console.log('data.types', this.dataTypes);
             this.columns = this.fieldsList.split(",").map((el) => ({
                 label: el,
                 fieldName: el,
                 type: this.dataTypes.get(el).toLowerCase()
             }));
-            console.log(this.columns);
-            this.isRendered = true;
+            this.chartJsInitialized = true;
         }
-        console.log('con');
     }
 
-    get vals() {
+    get valuesToSelect() {
         return this.recordId + '-' + this.sObjectType + '-' +
             this.relatedField + '-' +  this.fieldsList;
     }
 
-    @wire(recordCount, {listValues : '$vals'})
-    countRecords({ data }) {
+    @wire(numOfRecords, {listValues : '$valuesToSelect'})
+    numberOfRecords({ data }) {
         if (data) {
-            this.recordCount = data;
-            if ( this.recordCount ) {
-                if (this.recordCount > 3) {
+            this.numOfRecords = data;
+            if ( this.numOfRecords ) {
+                if (this.numOfRecords > 3) {
                     this.titleWithCount = ' (3+)';
                 }
                 else{
-                    this.titleWithCount = ' (' + this.recordCount + ')';
+                    this.titleWithCount = ' (' + this.numOfRecords + ')';
                 }
             }
         }
     }
 
-    @wire(getRecords, {listValues : '$vals'})
+    @wire(getRecords, {listValues : '$valuesToSelect'})
     recordData({data }){
         if ( data ) {
             this.listRecords = data;
         }
     }
 
-    @wire(getPluralLabel, {listValues : '$vals'})
-    pluralLabel({ data }){
+    @wire(getPluralLabel, {listValues : '$valuesToSelect'})
+    getPluralLabel({ data }){
         if ( data ) {
             this.pluralLabel = data;
         }
     }
-
-    createNew() {
+    createNewSObject() {
         this[NavigationMixin.Navigate]({
             type: 'standard__objectPage',
             attributes: {
